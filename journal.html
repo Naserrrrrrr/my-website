@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal & Book Tracker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e17055;
+            --secondary: #fab1a0;
+            --accent: #74b9ff;
+            --success: #55efc4;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --dashboard-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--dashboard-bg);
+            color: var(--light);
+            line-height: 1.6;
+        }
+
+        .dashboard-header {
+            background: rgba(26, 26, 46, 0.9);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-header h1 {
+            margin: 0 auto;
+            font-size: 1.5rem;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            padding: 20px;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: fit-content;
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h2 {
+            color: var(--light);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .progress-container {
+            margin: 15px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--light);
+            font-weight: 600;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: var(--secondary);
+        }
+
+        .btn-add {
+            width: 100%;
+        }
+
+        .book-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .book-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid var(--primary);
+        }
+
+        .book-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .book-item.active {
+            background: rgba(225, 112, 85, 0.2);
+            border-left: 3px solid var(--accent);
+        }
+
+        .book-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--light);
+        }
+
+        .book-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .journal-entry {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .entry-date {
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .entry-content {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.7;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .tag {
+            background: rgba(116, 185, 255, 0.2);
+            color: var(--accent);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-box input {
+            padding-left: 35px;
+        }
+
+        .rating {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .star {
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star.active {
+            color: #fdcb6e;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                margin-top: 70px;
+                padding: 15px;
+            }
+            
+            .dashboard-header h1 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <button class="back-button" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i> Dashboard
+        </button>
+        <h1><i class="fas fa-book-open"></i> Journal & Book Tracker</h1>
+        <div style="width: 100px;"></div> <!-- Spacer for balance -->
+    </div>
+
+    <div class="container">
+        <div class="app-container">
+            <div class="sidebar">
+                <h2>My Reading Stats</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-books">0</div>
+                        <div class="stat-label">Books Read</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="reading-goal">0/12</div>
+                        <div class="stat-label">Yearly Goal</div>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Progress</span>
+                        <span id="goal-percentage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <h2 style="margin-top: 25px;">Add New Book</h2>
+                <div class="form-group">
+                    <label for="book-title">Title</label>
+                    <input type="text" id="book-title" placeholder="Book title">
+                </div>
+                <div class="form-group">
+                    <label for="book-author">Author</label>
+                    <input type="text" id="book-author" placeholder="Author name">
+                </div>
+                <div class="form-group">
+                    <label for="book-pages">Pages</label>
+                    <input type="number" id="book-pages" placeholder="Total pages">
+                </div>
+                <div class="form-group">
+                    <label>Rating</label>
+                    <div class="rating" id="book-rating">
+                        <i class="fas fa-star star" data-rating="1"></i>
+                        <i class="fas fa-star star" data-rating="2"></i>
+                        <i class="fas fa-star star" data-rating="3"></i>
+                        <i class="fas fa-star star" data-rating="4"></i>
+                        <i class="fas fa-star star" data-rating="5"></i>
+                    </div>
+                </div>
+                <button class="btn-add" id="add-book"><i class="fas fa-plus"></i> Add Book</button>
+            </div>
+
+            <div class="main-content">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="book-search" placeholder="Search books...">
+                </div>
+
+                <div class="book-list" id="book-list">
+                    <div class="empty-state">
+                        <i class="fas fa-book-open" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>No books added yet. Add your first book!</p>
+                    </div>
+                </div>
+
+                <div id="journal-section" style="display: none;">
+                    <h2>Journal Entry</h2>
+                    <div class="form-group">
+                        <label for="entry-date">Date</label>
+                        <input type="date" id="entry-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="entry-content">What did you learn? (Summary/Notes)</label>
+                        <textarea id="entry-content" placeholder="Write your thoughts, key takeaways, or summary of the book..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="entry-tags">Tags (comma separated)</label>
+                        <input type="text" id="entry-tags" placeholder="fiction, self-help, psychology">
+                    </div>
+                    <button class="btn-add" id="save-entry"><i class="fas fa-save"></i> Save Journal Entry</button>
+
+                    <div id="journal-entries" style="margin-top: 30px;">
+                        <h2>Previous Entries</h2>
+                        <div id="entries-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load book and journal data from localStorage
+            let library = JSON.parse(localStorage.getItem('bookLibrary')) || {
+                books: [],
+                goal: 12,
+                currentBookId: null
+            };
+
+            // Initialize the app
+            renderBookList();
+            updateStats();
+            
+            // Set default date to today
+            document.getElementById('entry-date').valueAsDate = new Date();
+
+            // Rating system
+            const stars = document.querySelectorAll('.star');
+            let currentRating = 0;
+            
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    currentRating = rating;
+                    
+                    stars.forEach((s, index) => {
+                        if (index < rating) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            // Add new book
+            document.getElementById('add-book').addEventListener('click', function() {
+                const title = document.getElementById('book-title').value.trim();
+                const author = document.getElementById('book-author').value.trim();
+                const pages = parseInt(document.getElementById('book-pages').value) || 0;
+                
+                if (title && author) {
+                    const newBook = {
+                        id: Date.now(),
+                        title,
+                        author,
+                        pages,
+                        rating: currentRating,
+                        dateAdded: new Date().toISOString(),
+                        journalEntries: []
+                    };
+                    
+                    library.books.push(newBook);
+                    saveLibrary();
+                    renderBookList();
+                    updateStats();
+                    
+                    // Reset form
+                    document.getElementById('book-title').value = '';
+                    document.getElementById('book-author').value = '';
+                    document.getElementById('book-pages').value = '';
+                    currentRating = 0;
+                    stars.forEach(star => star.classList.remove('active'));
+                }
+            });
+
+            // Search books
+            document.getElementById('book-search').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const bookItems = document.querySelectorAll('.book-item');
+                
+                bookItems.forEach(item => {
+                    const title = item.querySelector('.book-title').textContent.toLowerCase();
+                    const author = item.querySelector('.book-meta span:first-child').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm) || author.includes(searchTerm)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // Save journal entry
+            document.getElementById('save-entry').addEventListener('click', function() {
+                const content = document.getElementById('entry-content').value.trim();
+                const date = document.getElementById('entry-date').value;
+                const tags = document.getElementById('entry-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
+                
+                if (content && library.currentBookId) {
+                    const book = library.books.find(b => b.id === library.currentBookId);
+                    if (book) {
+                        const newEntry = {
+                            id: Date.now(),
+                            date,
+                            content,
+                            tags,
+                            createdAt: new Date().toISOString()
+                        };
+                        
+                        book.journalEntries.unshift(newEntry);
+                        saveLibrary();
+                        renderJournalEntries(book.journalEntries);
+                        
+                        // Reset form
+                        document.getElementById('entry-content').value = '';
+                        document.getElementById('entry-tags').value = '';
+                        document.getElementById('entry-date').valueAsDate = new Date();
+                    }
+                }
+            });
+
+            // Helper functions
+            function saveLibrary() {
+                localStorage.setItem('bookLibrary', JSON.stringify(library));
+            }
+
+            function renderBookList() {
+                const bookListElement = document.getElementById('book-list');
+                
+                if (library.books.length === 0) {
+                    bookListElement.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-book-open" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                            <p>No books added yet. Add your first book!</p>
+                        </div>
+                    `;
+                    document.getElementById('journal-section').style.display = 'none';
+                    return;
+                }
+                
+                bookListElement.innerHTML = '';
+                
+                library.books.forEach(book => {
+                    const bookElement = document.createElement('div');
+                    bookElement.className = 'book-item';
+                    if (book.id === library.currentBookId) {
+                        bookElement.classList.add('active');
+                    }
+                    
+                    bookElement.innerHTML = `
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-meta">
+                            <span>${book.author}</span>
+                            <span>${book.pages} pages</span>
+                        </div>
+                        <div class="rating" style="margin-top: 5px; font-size: 0.9rem;">
+                            ${'<i class="fas fa-star" style="color: #fdcb6e;"></i>'.repeat(book.rating)}
+                            ${'<i class="fas fa-star" style="color: rgba(255,255,255,0.3);"></i>'.repeat(5 - book.rating)}
+                        </div>
+                    `;
+                    
+                    bookElement.addEventListener('click', function() {
+                        library.currentBookId = book.id;
+                        saveLibrary();
+                        
+                        // Highlight selected book
+                        document.querySelectorAll('.book-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                        
+                        // Show journal section
+                        document.getElementById('journal-section').style.display = 'block';
+                        
+                        // Load journal entries
+                        renderJournalEntries(book.journalEntries);
+                        
+                        // Set book title in journal section
+                        document.querySelector('#journal-section h2').textContent = `Journal Entry: ${book.title}`;
+                    });
+                    
+                    bookListElement.appendChild(bookElement);
+                });
+            }
+
+            function renderJournalEntries(entries) {
+                const entriesList = document.getElementById('entries-list');
+                
+                if (entries.length === 0) {
+                    entriesList.innerHTML = `
+                        <div class="empty-state" style="padding: 20px;">
+                            <p>No journal entries yet. Add your first entry!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                entriesList.innerHTML = '';
+                
+                entries.forEach(entry => {
+                    const entryDate = new Date(entry.date);
+                    const formattedDate = entryDate.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
+                    
+                    const entryElement = document.createElement('div');
+                    entryElement.className = 'journal-entry';
+                    entryElement.innerHTML = `
+                        <div class="entry-date">${formattedDate}</div>
+                        <div class="entry-content">${entry.content}</div>
+                        ${entry.tags.length > 0 ? `
+                            <div class="tags">
+                                ${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    `;
+                    
+                    entriesList.appendChild(entryElement);
+                });
+            }
+
+            function updateStats() {
+                document.getElementById('total-books').textContent = library.books.length;
+                document.getElementById('reading-goal').textContent = `${library.books.length}/${library.goal}`;
+                
+                const percentage = Math.min(100, (library.books.length / library.goal) * 100);
+                document.getElementById('goal-percentage').textContent = `${Math.round(percentage)}%`;
+                document.querySelector('.progress-fill').style.width = `${percentage}%`;
+            }
+        });
+    </script>
+</body>
+</html>

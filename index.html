@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Personal App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: var(--light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Remove underlines from anchor tags */
+        a {
+            text-decoration: none; /* Removes the default underline */
+        }
+
+        header {
+            background: rgba(26, 26, 46, 0.9);
+            color: var(--light);
+            padding: 8px 0;
+            text-align: center;
+            font-size: 20px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: top 0.3s ease;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 120px 20px 60px; /* Adjusted for the header */
+            max-width: 1200px;
+            width: 100%;
+            margin-top: 60px; /* Added space for header */
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            width: 250px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            display: inline-block;
+            width: 70px;
+            height: 70px;
+            line-height: 70px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .feature-item h3 {
+            margin: 15px 0;
+            font-size: 18px;
+            color: var(--light);
+            font-weight: 600;
+        }
+
+        .feature-item p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: rgba(26, 26, 46, 0.9);
+            color: white;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            font-size: 13px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 70px 15px 60px;
+            }
+            
+            .feature-item {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            header {
+                font-size: 18px;
+                padding: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><i class="fas fa-user-circle" style="margin-right: 8px;"></i> Your Personal Dashboard</h1>
+    </header>
+
+    <div class="container">
+        <!-- Budget Planner -->
+        <a href="budget-planner.html" class="feature-item">
+            <div class="icon" style="color: #55efc4;"><i class="fas fa-wallet"></i></div>
+            <h3>Budget Planner</h3>
+            <p>Track income, expenses, and set budgets to manage your finances effectively.</p>
+            <div class="btn">Go to Budget Planner</div>
+        </a>
+
+        <!-- Schedule -->
+        <a href="schedule.html" class="feature-item">
+            <div class="icon" style="color: #0984e3;"><i class="fas fa-calendar-alt"></i></div>
+            <h3>Schedule</h3>
+            <p>Plan daily, weekly, or monthly appointments and tasks with reminders.</p>
+            <div class="btn">View Schedule</div>
+        </a>
+
+        <!-- Journal / Book Reading -->
+        <a href="journal.html" class="feature-item">
+            <div class="icon" style="color: #e17055;"><i class="fas fa-book-open"></i></div>
+            <h3>Journal / Reading</h3>
+            <p>Track your books and write reflections or summaries with tags.</p>
+            <div class="btn">Start Journaling</div>
+        </a>
+
+        <!-- Health Tracker -->
+        <a href="health.html" class="feature-item">
+            <div class="icon" style="color: #ff7675;"><i class="fas fa-heartbeat"></i></div>
+            <h3>Health Tracker</h3>
+            <p>Monitor water intake, exercise, sleep patterns, and nutrition.</p>
+            <div class="btn">Monitor Health</div>
+        </a>
+
+        <!-- Habit Tracker -->
+        <a href="habit.html" class="feature-item">
+            <div class="icon" style="color: #fdcb6e;"><i class="fas fa-sync-alt"></i></div>
+            <h3>Habit Tracker</h3>
+            <p>Build and track daily habits with streaks and statistics.</p>
+            <div class="btn">Track Habits</div>
+        </a>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Personal Dashboard. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

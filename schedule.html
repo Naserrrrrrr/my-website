@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Schedule Planner</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cae;
+            --accent-color: #ff7e5f;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --event-color: #e83e8c;
+            --dashboard-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--dashboard-bg);
+            color: var(--light-color);
+            line-height: 1.6;
+        }
+
+        .dashboard-header {
+            background: rgba(26, 26, 46, 0.9);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-header h1 {
+            margin: 0 auto;
+            font-size: 1.5rem;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1, h2 {
+            color: var(--light-color);
+            margin-bottom: 10px;
+        }
+
+        .date-display {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+        }
+
+        .app-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .calendar-container, .task-form, .schedule-display {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .calendar-container {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .task-form {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .schedule-display {
+            flex: 2;
+            min-width: 300px;
+        }
+
+        /* Rest of your existing styles... */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--light-color);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-add {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .time-slots {
+            margin-top: 20px;
+        }
+
+        .time-slot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .time-slot:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .time-info {
+            flex: 1;
+        }
+
+        .time-range {
+            font-weight: 600;
+            color: var(--light-color);
+        }
+
+        .task-info {
+            flex: 3;
+        }
+
+        .task-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--light-color);
+        }
+
+        .task-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .task-actions {
+            flex: 1;
+            text-align: right;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        .empty-schedule {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .priority-high {
+            border-left: 4px solid #dc3545;
+        }
+
+        .priority-medium {
+            border-left: 4px solid #ffc107;
+        }
+
+        .priority-low {
+            border-left: 4px solid #28a745;
+        }
+
+        .event-task {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .event-event {
+            border-left: 4px solid var(--event-color);
+        }
+
+        /* Calendar Styles */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--light-color);
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav button {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            padding: 5px;
+            color: var(--light-color);
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            padding: 5px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+        }
+
+        .calendar-day:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .calendar-day.empty {
+            background-color: transparent;
+            cursor: default;
+        }
+
+        .calendar-day.today {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .calendar-day.selected {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .day-events {
+            font-size: 0.7rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .event-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 2px;
+        }
+
+        .event-indicator.task {
+            background-color: var(--primary-color);
+        }
+
+        .event-indicator.event {
+            background-color: var(--event-color);
+        }
+
+        .event-type-selector {
+            display: flex;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .event-type-option {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .event-type-option.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .event-type-option:not(:last-child) {
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .all-day-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .all-day-option input[type="checkbox"] {
+            width: auto;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .container {
+                margin-top: 70px;
+                padding: 15px;
+            }
+            
+            .dashboard-header h1 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <button class="back-button" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i> Dashboard
+        </button>
+        <h1><i class="fas fa-calendar-alt"></i> Schedule Planner</h1>
+        <div style="width: 100px;"></div> <!-- Spacer for balance -->
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>My Schedule Planner</h1>
+            <div class="date-display" id="current-date"></div>
+        </header>
+
+        <div class="app-container">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-title" id="calendar-month-year"></div>
+                    <div class="calendar-nav">
+                        <button id="prev-month">&lt;</button>
+                        <button id="today-btn">Today</button>
+                        <button id="next-month">&gt;</button>
+                    </div>
+                </div>
+                <div class="calendar-grid" id="calendar-headers">
+                    <div class="calendar-day-header">Sun</div>
+                    <div class="calendar-day-header">Mon</div>
+                    <div class="calendar-day-header">Tue</div>
+                    <div class="calendar-day-header">Wed</div>
+                    <div class="calendar-day-header">Thu</div>
+                    <div class="calendar-day-header">Fri</div>
+                    <div class="calendar-day-header">Sat</div>
+                </div>
+                <div class="calendar-grid" id="calendar-days"></div>
+            </div>
+
+            <div class="task-form">
+                <h2>Add New Item</h2>
+                <div class="event-type-selector">
+                    <div class="event-type-option selected" data-type="task">Task</div>
+                    <div class="event-type-option" data-type="event">Event</div>
+                </div>
+                <form id="task-form">
+                    <div class="form-group" id="event-date-group">
+                        <label for="event-date">Date</label>
+                        <input type="date" id="event-date" required>
+                    </div>
+                    <div class="form-group" id="task-time-group">
+                        <label for="task-time">Time</label>
+                        <input type="time" id="task-time">
+                    </div>
+                    <div class="all-day-option" id="all-day-group">
+                        <input type="checkbox" id="all-day">
+                        <label for="all-day">All day event</label>
+                    </div>
+                    <div class="form-group" id="duration-group">
+                        <label for="task-duration">Duration (minutes)</label>
+                        <input type="number" id="task-duration" min="15" max="1440" value="30">
+                    </div>
+                    <div class="form-group">
+                        <label for="task-title">Title</label>
+                        <input type="text" id="task-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-description">Description</label>
+                        <textarea id="task-description"></textarea>
+                    </div>
+                    <div class="form-group" id="priority-group">
+                        <label for="task-priority">Priority (for tasks)</label>
+                        <select id="task-priority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-add">Add to Schedule</button>
+                </form>
+            </div>
+
+            <div class="schedule-display">
+                <h2 id="schedule-title">Today's Schedule</h2>
+                <div class="time-slots" id="schedule-items">
+                    <div class="empty-schedule">
+                        No items scheduled for today. Add your first item!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Current date elements
+            const currentDateElement = document.getElementById('current-date');
+            const scheduleTitleElement = document.getElementById('schedule-title');
+            
+            // Calendar elements
+            const calendarMonthYear = document.getElementById('calendar-month-year');
+            const calendarDays = document.getElementById('calendar-days');
+            const prevMonthBtn = document.getElementById('prev-month');
+            const nextMonthBtn = document.getElementById('next-month');
+            const todayBtn = document.getElementById('today-btn');
+            
+            // Form elements
+            const taskForm = document.getElementById('task-form');
+            const eventTypeOptions = document.querySelectorAll('.event-type-option');
+            const eventDateInput = document.getElementById('event-date');
+            const taskTimeInput = document.getElementById('task-time');
+            const allDayCheckbox = document.getElementById('all-day');
+            const durationInput = document.getElementById('task-duration');
+            const priorityGroup = document.getElementById('priority-group');
+            const timeGroup = document.getElementById('task-time-group');
+            const durationGroup = document.getElementById('duration-group');
+            
+            // Schedule display
+            const scheduleItems = document.getElementById('schedule-items');
+            
+            // Initialize current date
+            let currentDate = new Date();
+            let selectedDate = new Date();
+            let currentMonth = currentDate.getMonth();
+            let currentYear = currentDate.getFullYear();
+            
+            // Load events from localStorage
+            let events = JSON.parse(localStorage.getItem('calendarEvents')) || [];
+            
+            // Initialize the app
+            updateDateDisplay();
+            renderCalendar();
+            renderSchedule();
+            setFormDate(selectedDate);
+            
+            // Event listeners for calendar navigation
+            prevMonthBtn.addEventListener('click', function() {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                renderCalendar();
+            });
+            
+            nextMonthBtn.addEventListener('click', function() {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                renderCalendar();
+            });
+            
+            todayBtn.addEventListener('click', function() {
+                currentDate = new Date();
+                currentMonth = currentDate.getMonth();
+                currentYear = currentDate.getFullYear();
+                selectedDate = new Date(currentDate);
+                setFormDate(selectedDate);
+                renderCalendar();
+                renderSchedule();
+            });
+            
+            // Event type selector
+            eventTypeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    eventTypeOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    const eventType = this.getAttribute('data-type');
+                    updateFormForEventType(eventType);
+                });
+            });
+            
+            // All day checkbox
+            allDayCheckbox.addEventListener('change', function() {
+                timeGroup.style.display = this.checked ? 'none' : 'block';
+                durationGroup.style.display = this.checked ? 'none' : 'block';
+            });
+            
+            // Form submission
+            taskForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const eventType = document.querySelector('.event-type-option.selected').getAttribute('data-type');
+                const title = document.getElementById('task-title').value;
+                const description = document.getElementById('task-description').value;
+                const date = document.getElementById('event-date').value;
+                const allDay = document.getElementById('all-day').checked;
+                const time = allDay ? null : document.getElementById('task-time').value;
+                const duration = allDay ? null : parseInt(document.getElementById('task-duration').value);
+                const priority = eventType === 'task' ? document.getElementById('task-priority').value : null;
+                
+                // Create event object
+                const event = {
+                    id: Date.now(),
+                    type: eventType,
+                    title,
+                    description,
+                    date,
+                    allDay,
+                    time,
+                    duration,
+                    priority
+                };
+                
+                // Add to events array
+                events.push(event);
+                
+                // Save to localStorage
+                localStorage.setItem('calendarEvents', JSON.stringify(events));
+                
+                // Render calendar and schedule
+                renderCalendar();
+                renderSchedule();
+                
+                // Reset form
+                taskForm.reset();
+                document.getElementById('task-duration').value = 30;
+                document.getElementById('task-priority').value = 'medium';
+                document.getElementById('all-day').checked = false;
+                timeGroup.style.display = 'block';
+                durationGroup.style.display = 'block';
+                setFormDate(selectedDate);
+            });
+            
+            // Functions
+            function updateDateDisplay() {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                currentDateElement.textContent = currentDate.toLocaleDateString('en-US', options);
+            }
+            
+            function renderCalendar() {
+                // Set calendar title
+                const monthNames = ["January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"];
+                calendarMonthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+                
+                // Clear previous calendar days
+                calendarDays.innerHTML = '';
+                
+                // Get first day of month and total days in month
+                const firstDay = new Date(currentYear, currentMonth, 1);
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                
+                // Get day of week for first day (0 = Sunday, 6 = Saturday)
+                const startingDay = firstDay.getDay();
+                
+                // Add empty cells for days before the first day of the month
+                for (let i = 0; i < startingDay; i++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day empty';
+                    calendarDays.appendChild(dayElement);
+                }
+                
+                // Add cells for each day of the month
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    
+                    // Check if this day is today
+                    const date = new Date(currentYear, currentMonth, day);
+                    if (date.toDateString() === currentDate.toDateString()) {
+                        dayElement.classList.add('today');
+                    }
+                    
+                    // Check if this day is selected
+                    if (date.toDateString() === selectedDate.toDateString()) {
+                        dayElement.classList.add('selected');
+                    }
+                    
+                    // Add day number
+                    const dayNumber = document.createElement('div');
+                    dayNumber.className = 'day-number';
+                    dayNumber.textContent = day;
+                    dayElement.appendChild(dayNumber);
+                    
+                    // Add events for this day
+                    const dayEvents = getEventsForDate(date);
+                    if (dayEvents.length > 0) {
+                        const eventsContainer = document.createElement('div');
+                        eventsContainer.className = 'day-events';
+                        
+                        dayEvents.forEach(event => {
+                            const eventIndicator = document.createElement('span');
+                            eventIndicator.className = `event-indicator ${event.type}`;
+                            eventsContainer.appendChild(eventIndicator);
+                        });
+                        
+                        dayElement.appendChild(eventsContainer);
+                    }
+                    
+                    // Add click event to select this day
+                    dayElement.addEventListener('click', function() {
+                        selectedDate = new Date(currentYear, currentMonth, day);
+                        setFormDate(selectedDate);
+                        renderCalendar();
+                        renderSchedule();
+                    });
+                    
+                    calendarDays.appendChild(dayElement);
+                }
+            }
+            
+            function renderSchedule() {
+                // Update schedule title
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                scheduleTitleElement.textContent = `Schedule for ${selectedDate.toLocaleDateString('en-US', options)}`;
+                
+                // Get events for selected date
+                const dayEvents = getEventsForDate(selectedDate);
+                
+                if (dayEvents.length === 0) {
+                    scheduleItems.innerHTML = `
+                        <div class="empty-schedule">
+                            No items scheduled for this day. Add your first item!
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Sort events by time (all-day events first, then by time)
+                dayEvents.sort((a, b) => {
+                    if (a.allDay && !b.allDay) return -1;
+                    if (!a.allDay && b.allDay) return 1;
+                    if (a.allDay && b.allDay) return 0;
+                    return a.time.localeCompare(b.time);
+                });
+                
+                let html = '';
+                
+                dayEvents.forEach(event => {
+                    let timeInfo = '';
+                    let eventClass = '';
+                    
+                    if (event.allDay) {
+                        timeInfo = '<div class="time-range">All day</div>';
+                    } else {
+                        // Convert time to 12-hour format
+                        const timeParts = event.time.split(':');
+                        let hours = parseInt(timeParts[0]);
+                        const minutes = timeParts[1];
+                        const ampm = hours >= 12 ? 'PM' : 'AM';
+                        hours = hours % 12;
+                        hours = hours ? hours : 12; // the hour '0' should be '12'
+                        const displayTime = `${hours}:${minutes} ${ampm}`;
+                        
+                        // Calculate end time
+                        const endTime = new Date(`2000-01-01T${event.time}:00`);
+                        endTime.setMinutes(endTime.getMinutes() + event.duration);
+                        const endHours = endTime.getHours();
+                        const endMinutes = endTime.getMinutes().toString().padStart(2, '0');
+                        const endAmpm = endHours >= 12 ? 'PM' : 'AM';
+                        const displayEndHours = endHours % 12 || 12;
+                        const displayEndTime = `${displayEndHours}:${endMinutes} ${endAmpm}`;
+                        
+                        timeInfo = `
+                            <div class="time-range">${displayTime} - ${displayEndTime}</div>
+                            <small>${event.duration} min</small>
+                        `;
+                    }
+                    
+                    // Set class based on event type
+                    eventClass = `event-${event.type}`;
+                    
+                    // For tasks, add priority class
+                    if (event.type === 'task') {
+                        eventClass += ` priority-${event.priority}`;
+                    }
+                    
+                    html += `
+                        <div class="time-slot ${eventClass}">
+                            <div class="time-info">
+                                ${timeInfo}
+                            </div>
+                            <div class="task-info">
+                                <div class="task-title">${event.title}</div>
+                                <div class="task-description">${event.description || 'No description'}</div>
+                            </div>
+                            <div class="task-actions">
+                                <button class="btn-delete" data-id="${event.id}">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                scheduleItems.innerHTML = html;
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.btn-delete').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const eventId = parseInt(this.getAttribute('data-id'));
+                        events = events.filter(event => event.id !== eventId);
+                        localStorage.setItem('calendarEvents', JSON.stringify(events));
+                        renderCalendar();
+                        renderSchedule();
+                    });
+                });
+            }
+            
+            function getEventsForDate(date) {
+                const dateStr = date.toISOString().split('T')[0];
+                return events.filter(event => event.date === dateStr);
+            }
+            
+            function setFormDate(date) {
+                const dateStr = date.toISOString().split('T')[0];
+                eventDateInput.value = dateStr;
+            }
+            
+            function updateFormForEventType(eventType) {
+                if (eventType === 'task') {
+                    priorityGroup.style.display = 'block';
+                    timeGroup.style.display = 'block';
+                    durationGroup.style.display = 'block';
+                    allDayCheckbox.checked = false;
+                    document.getElementById('all-day-group').style.display = 'flex';
+                } else if (eventType === 'event') {
+                    priorityGroup.style.display = 'none';
+                    timeGroup.style.display = 'block';
+                    durationGroup.style.display = 'block';
+                    document.getElementById('all-day-group').style.display = 'flex';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
